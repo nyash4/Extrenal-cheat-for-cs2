@@ -1,9 +1,9 @@
 #ifndef MENU_HPP
 #define MENU_HPP
 
-#include "Imgui/imgui.h"
-#include "Imgui/imgui_impl_opengl3.h"
-#include "Imgui/imgui_impl_glfw.h"
+#include "../Imgui/imgui.h"
+#include "../Imgui/imgui_impl_opengl3.h"
+#include "../Imgui/imgui_impl_glfw.h"
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
@@ -29,6 +29,8 @@ void RenderMenu();
 
 // Функция для управления кликабельностью окна
 void SetClickable(bool clickable);
+
+void MainRenderLoop();
 
 #ifdef _WIN32
 // Функция для запуска глобального хука клавиатуры

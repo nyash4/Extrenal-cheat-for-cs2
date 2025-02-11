@@ -15,6 +15,15 @@
     <Filter Include="Menu">
       <UniqueIdentifier>{4f049c5f-5709-4644-bd94-6f72b13c70ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Offsets">
+      <UniqueIdentifier>{591c4589-aeb0-4a86-814a-a22f33cab3ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{4cd6db67-65a6-4d3f-8a42-5de546fd35a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hacks">
+      <UniqueIdentifier>{896f6b0e-dd8b-4c55-b3d6-99f8f20dc9c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -44,8 +53,17 @@
     <ClCompile Include="Imgui\imgui_tables.cpp">
       <Filter>Imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Menu.cpp">
+    <ClCompile Include="Memory\memory.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Menu\Menu.cpp">
       <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="ESP.hpp">
+      <Filter>Hacks</Filter>
+    </ClCompile>
+    <ClCompile Include="Radar.cpp">
+      <Filter>Hacks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -76,8 +94,20 @@
     <ClInclude Include="Imgui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Menu.hpp">
+    <ClInclude Include="Offsets.h">
+      <Filter>Offsets</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\memory.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Offsets\Offsets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu\Menu.hpp">
       <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Radar.hpp">
+      <Filter>Hacks</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

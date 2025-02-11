@@ -1,4 +1,5 @@
-#include "menu.hpp"
+#include "../ImguiMenu/Menu/Menu.hpp"
+#include "../ImguiMenu/Radar.hpp"
 
 int main() {
     glfwInit();
@@ -22,6 +23,8 @@ int main() {
 
     InitMenu(window); // Инициализация меню
 
+ 
+
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -29,13 +32,7 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // Рисуем линию
-        ImDrawList* draw_list = ImGui::GetForegroundDrawList();
-        ImVec2 p1 = ImVec2(0, 0);
-        ImVec2 p2 = ImVec2(1200, 1000);
-        draw_list->AddLine(p1, p2, IM_COL32(255, 0, 0, 255), 10.0f);
-
-        RenderMenu(); // Отрисовка меню
+        MainRenderLoop(); // Отрисовка меню
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -1,4 +1,7 @@
 #include "menu.hpp"
+#include "../Radar.hpp"
+
+Radar radar;
 
 bool show_menu = false;
 GLFWwindow* window = nullptr;
@@ -25,24 +28,70 @@ void InitMenu(GLFWwindow* win) {
 #endif
 }
 
+static bool radarEnabled = false;
+
 // Отрисовка меню
 void RenderMenu() {
     if (!show_menu) return;
 
-    ImGui::Begin("Menu");
-    ImGui::Text("Hey, this is nice and easy!");
-    static bool active = true;
-    ImGui::Checkbox("ESP", &active);
+    static bool espEnabled = false;
+    static bool aimEnabled = false;
+    static float aimValue = 1.0f;
+   
 
-    if (ImGui::Button("!!Close!!")) {
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        exit(0);
+    // Set constraints before window creation
+    ImGui::SetNextWindowSizeConstraints(ImVec2(300, 200), ImVec2(FLT_MAX, FLT_MAX));
+
+    if (ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoCollapse)) {
+        if (ImGui::BeginTabBar("MainTabs")) {
+            // AIM Tab
+            if (ImGui::BeginTabItem("AIM")) {
+                ImGui::Checkbox("Enable Aim Assist", &aimEnabled);
+                if (aimEnabled) {
+                    ImGui::SliderFloat("Aim Strength", &aimValue, 0.01f, 7.0f, "%.2f");
+                }
+                ImGui::EndTabItem();
+            }
+
+            // ESP Tab
+            if (ImGui::BeginTabItem("ESP")) {
+                ImGui::Checkbox("Enable ESP", &espEnabled);
+                ImGui::EndTabItem();
+            }
+
+            // MISC Tab
+            if (ImGui::BeginTabItem("MISC")) {
+                ImGui::Checkbox("Radar Hack", &radarEnabled);
+                ImGui::EndTabItem();
+            }
+
+            ImGui::EndTabBar();
+        }
+
+        // Close button
+        ImGui::Separator();
+        if (ImGui::Button("!!Close Program!!")) {
+            // Cleanup code
+            ImGui_ImplOpenGL3_Shutdown();
+            ImGui_ImplGlfw_Shutdown();
+            ImGui::DestroyContext();
+            glfwDestroyWindow(window);
+            glfwTerminate();
+            exit(0);
+        }
+        ImGui::End();
     }
-    ImGui::End();
+}
+
+void MainRenderLoop() {
+    // Рендерим меню
+    RenderMenu();
+
+    // Рендерим радар независимо от меню
+    if (radarEnabled) {
+        radar.Update();
+        radar.Draw();
+    }
 }
 
 // Установка кликабельности окна
