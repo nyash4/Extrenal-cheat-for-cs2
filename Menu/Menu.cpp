@@ -70,11 +70,15 @@ void RenderMenu() {
                     static bool boxes = true;
                     static bool lines = true;
                     static bool team_check = true;
-                    if (ImGui::Checkbox("Boxes", &boxes)) {
+                    static bool fullBodyBox = true;
+                    if (ImGui::Checkbox("HeadBoxes", &boxes)) {
                         esp.SetBoxEnabled(boxes);
                     }
                     if (ImGui::Checkbox("Lines", &lines)) {
                         esp.SetLineEnabled(lines);
+                    }
+                    if (ImGui::Checkbox("FullBodyBox", &fullBodyBox)) {
+                        esp.SetFullBoxEnabled(fullBodyBox);
                     }
                     if (ImGui::Checkbox("Team Check", &team_check)) {
                         esp.SetTeamCheckEnabled(team_check);

@@ -62,6 +62,20 @@ void ESP::Render() {
         if (drawLines) {
             DrawLineToEnemy(screenPos, color, res.width, res.height);
         }
+        if(drawFullBodyBoxes) {
+            // Вычисляем мировую позицию головы
+            Vec3 headScreenPos = WorldToScreen(entity.position, viewMatrix, res.width, res.height);
+
+            // Вычисляем мировую позицию ног.
+            // Предполагаем, что ось Z – вертикальная, и голова находится на 50 единиц выше ног.
+            Vec3 feetWorldPos = { entity.position.x, entity.position.y, entity.position.z - 50.f };
+            Vec3 feetScreenPos = WorldToScreen(feetWorldPos, viewMatrix, res.width, res.height);
+
+            // Если позиция ног некорректна (например, за камерой), пропускаем отрисовку полного бокса
+            if (feetScreenPos.z < 0.1f) continue;
+
+            DrawFullBodyBox(headScreenPos, feetScreenPos, color);
+        }
     }
 }
 
@@ -118,9 +132,30 @@ void ESP::DrawLineToEnemy(const Vec3& screenPos, const ImColor& color, int width
     );
 }
 
+    //box на всё тело
+void ESP::DrawFullBodyBox(const Vec3& headScreen, const Vec3& feetScreen, const ImColor& color) {
+    // Вычисляем высоту бокса в пикселях
+    float boxHeight = feetScreen.y - headScreen.y;
+    // Задаём ширину, например, равную половине высоты (можно настроить под себя)
+    float boxWidth = boxHeight / 2.0f;
+
+    ImVec2 boxTopLeft(headScreen.x - boxWidth, headScreen.y);
+    ImVec2 boxBottomRight(headScreen.x + boxWidth, feetScreen.y);
+
+    ImGui::GetBackgroundDrawList()->AddRect(
+        boxTopLeft,
+        boxBottomRight,
+        color,
+        0.0f,
+        ImDrawFlags_RoundCornersAll,
+        boxThickness
+    );
+}
+
 // Методы управления состоянием
 void ESP::SetEnabled(bool enabled) { espEnabled = enabled; }
 bool ESP::IsEnabled() const { return espEnabled; }
 void ESP::SetBoxEnabled(bool enabled) { drawBoxes = enabled; }
+void ESP::SetFullBoxEnabled(bool enabled) { drawFullBodyBoxes = enabled; }
 void ESP::SetLineEnabled(bool enabled) { drawLines = enabled; }
 void ESP::SetTeamCheckEnabled(bool enabled) { teamCheck = enabled; }

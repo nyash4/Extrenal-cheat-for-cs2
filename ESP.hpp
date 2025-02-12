@@ -32,10 +32,12 @@ public:
     void SetBoxEnabled(bool enabled); // Включение/выключение отрисовки боксов
     void SetLineEnabled(bool enabled); // Включение/выключение отрисовки линий
     void SetTeamCheckEnabled(bool enabled); // Включение/выключение проверки команды
+	void SetFullBoxEnabled(bool enabled); // Включение/выключение отрисовки боксов на всё тело
 
 private:
     void DrawBox(const Vec3& screenPos, const ImColor& color, int width, int height); // Отрисовка 3D-бокса
     void DrawLineToEnemy(const Vec3& screenPos, const ImColor& color, int width, int height); // Отрисовка линии до врага
+    void DrawFullBodyBox(const Vec3& headScreen, const Vec3& feetScreen, const ImColor& color);
     Vec3 WorldToScreen(const Vec3& worldPos, view_matrix_t matrix, int width, int height) const; // Преобразование мировых координат в экранные
 
     EntityManager& entityManager; // Ссылка на менеджер сущностей
@@ -44,6 +46,7 @@ private:
     std::atomic<bool> drawBoxes{ true }; // Отрисовывать ли боксы
     std::atomic<bool> drawLines{ true }; // Отрисовывать ли линии
     std::atomic<bool> teamCheck{ true }; // Проверять ли команду
+    std::atomic<bool> drawFullBodyBoxes{ true }; // Проверять ли команду
 
     // Параметры отрисовки
     ImColor enemyColor = ImColor(255, 0, 0, 255); // Цвет врагов (красный)
