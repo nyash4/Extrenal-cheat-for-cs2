@@ -1,17 +1,24 @@
 #include "menu.hpp"
 #include "../Radar.hpp"
+#include "../EntityManager.hpp"
+#include "../ESP.hpp"
 
-Radar radar;
-
+// Глобальные переменные
 bool show_menu = false;
 GLFWwindow* window = nullptr;
 HWND hwnd = nullptr;
+
+// Инициализация меню и EntityManager
+EntityManager entityManager;       // Создаем менеджер сущностей
+Radar radar(entityManager);          // Передаем менеджер в радар
+ESP esp(entityManager);              // Создаем объект ESP, используя менеджер сущностей
 
 // Инициализация меню
 void InitMenu(GLFWwindow* win) {
     window = win;
     hwnd = glfwGetWin32Window(window);
 
+    // Инициализация ImGui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -20,7 +27,7 @@ void InitMenu(GLFWwindow* win) {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    SetClickable(false); // Изначально окно прозрачное
+    SetClickable(false); // Изначально окно не кликабельно
 
 #ifdef _WIN32
     std::thread keyboardThread(StartKeyboardHook);
@@ -37,14 +44,13 @@ void RenderMenu() {
     static bool espEnabled = false;
     static bool aimEnabled = false;
     static float aimValue = 1.0f;
-   
 
-    // Set constraints before window creation
+    // Устанавливаем ограничения по размеру окна
     ImGui::SetNextWindowSizeConstraints(ImVec2(300, 200), ImVec2(FLT_MAX, FLT_MAX));
 
     if (ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoCollapse)) {
         if (ImGui::BeginTabBar("MainTabs")) {
-            // AIM Tab
+            // Вкладка AIM
             if (ImGui::BeginTabItem("AIM")) {
                 ImGui::Checkbox("Enable Aim Assist", &aimEnabled);
                 if (aimEnabled) {
@@ -53,13 +59,38 @@ void RenderMenu() {
                 ImGui::EndTabItem();
             }
 
-            // ESP Tab
+            // Вкладка ESP
             if (ImGui::BeginTabItem("ESP")) {
-                ImGui::Checkbox("Enable ESP", &espEnabled);
+                // Включение/отключение ESP
+                if (ImGui::Checkbox("Enable ESP", &espEnabled)) {
+                    esp.SetEnabled(espEnabled);
+                }
+                if (espEnabled) {
+                    // Локальные переменные для настроек ESP
+                    static bool boxes = true;
+                    static bool lines = true;
+                    static bool team_check = true;
+                    if (ImGui::Checkbox("Boxes", &boxes)) {
+                        esp.SetBoxEnabled(boxes);
+                    }
+                    if (ImGui::Checkbox("Lines", &lines)) {
+                        esp.SetLineEnabled(lines);
+                    }
+                    if (ImGui::Checkbox("Team Check", &team_check)) {
+                        esp.SetTeamCheckEnabled(team_check);
+                    }
+                    // Цвета для ESP – используем локальные переменные ImVec4.
+                    // Если в классе ESP имеются сеттеры для изменения цветов,
+                    // здесь можно вызвать их после редактирования.
+                    static ImVec4 enemyColor = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+                    static ImVec4 teamColor = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+                    ImGui::ColorEdit4("Enemy Color", (float*)&enemyColor);
+                    ImGui::ColorEdit4("Team Color", (float*)&teamColor);
+                }
                 ImGui::EndTabItem();
             }
 
-            // MISC Tab
+            // Вкладка MISC
             if (ImGui::BeginTabItem("MISC")) {
                 ImGui::Checkbox("Radar Hack", &radarEnabled);
                 ImGui::EndTabItem();
@@ -68,10 +99,10 @@ void RenderMenu() {
             ImGui::EndTabBar();
         }
 
-        // Close button
+        // Кнопка завершения работы программы
         ImGui::Separator();
         if (ImGui::Button("!!Close Program!!")) {
-            // Cleanup code
+            // Очистка ресурсов и завершение
             ImGui_ImplOpenGL3_Shutdown();
             ImGui_ImplGlfw_Shutdown();
             ImGui::DestroyContext();
@@ -87,11 +118,14 @@ void MainRenderLoop() {
     // Рендерим меню
     RenderMenu();
 
-    // Рендерим радар независимо от меню
+    // Рендерим радар, если он включен
     if (radarEnabled) {
-        radar.Update();
-        radar.Draw();
+        radar.Update();  // Обновляем данные радара
+        radar.Draw();    // Отрисовываем радар
     }
+
+    // Отрисовываем ESP (внутри него может быть проверка включённости)
+    esp.Render();
 }
 
 // Установка кликабельности окна

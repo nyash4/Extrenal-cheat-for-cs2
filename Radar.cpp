@@ -3,10 +3,15 @@
 #include <algorithm>
 #include <fstream>
 #include <regex>
-#include "../ImguiMenu/Memory/memory.h"
-#include "../ImguiMenu/Offsets/Offsets.h"
+#include <thread>
+
 
 #define NOMINMAX
+
+Radar::Radar(EntityManager& em) : entityManager(em) {
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+}
 
 
 template <typename T>
@@ -14,20 +19,8 @@ T Mymax(T a, T b) {
     return (a > b) ? a : b;
 }
 
-Radar::Radar() : entities(256) {
-    // Инициализация GDI+
-    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-
-    updateThread = std::thread(&Radar::EntityUpdateThread, this);
-}
-
 Radar::~Radar() {
-    running = false;
-    if (updateThread.joinable()) updateThread.join();
     if (textureID) glDeleteTextures(1, &textureID);
-
-    // Завершение работы GDI+
     Gdiplus::GdiplusShutdown(gdiplusToken);
 }
 
@@ -61,7 +54,7 @@ void Radar::Draw() {
     );
 
     if (ImGui::Begin("Radar", nullptr,
-        ImGuiWindowFlags_NoCollapse )) // Убрать этот флаг, если нужно ручное изменение
+        ImGuiWindowFlags_NoCollapse)) // Убрать этот флаг, если нужно ручное изменение
     {
         // Получаем текущий размер окна
         windowSize = ImGui::GetWindowSize();
@@ -84,21 +77,24 @@ void Radar::Draw() {
         );
 
         // Рендерим точки
-        std::lock_guard<std::mutex> lock(entitiesMutex);
+        auto entities = entityManager.GetEntities();
+        int localTeam = entityManager.GetLocalTeam();
+        int localPlayerIndex = entityManager.GetLocalPlayerIndex();
+
         for (int i = 0; i < entities.size(); i++) {
             if (entities[i].isValid) {
-                Vec2 screen = entities[i].position;
+                Vec2 screen = WorldToScreen(entities[i].position.x, entities[i].position.y);
                 ImVec2 pointPos(
                     pos.x + (screen.x / 1024.0f) * squareSize,
-                    pos.y + (screen.y / 1024.0f ) * (squareSize) // Инвертируем Y-координату
+                    pos.y + (screen.y / 1024.0f) * (squareSize) // Инвертируем Y-координату
                 );
 
                 ImColor color;
-                if (i == g_localPlayerIndex) {
+                if (i == localPlayerIndex) {
                     color = ImColor(255, 255, 0); // Желтый для локального игрока
                 }
                 else {
-                    color = (entities[i].team == g_LocalTeam)
+                    color = (entities[i].team == localTeam)
                         ? ImColor(0, 255, 0)   // Зеленый для союзников
                         : ImColor(255, 0, 0);   // Красный для врагов
                 }
@@ -109,8 +105,8 @@ void Radar::Draw() {
         ImGui::End();
     }
 }
-  
-    
+
+
 
 
 // Остальные методы остаются без изменений
@@ -173,64 +169,6 @@ void Radar::LoadMapTexture(const std::string& mapName) {
         }
 
         delete bitmap;
-    }
-}
-
-void Radar::EntityUpdateThread() {
-    while (running) {
-        uintptr_t localPlayer = 0;
-        try {
-            localPlayer = VARS::memRead<uintptr_t>(VARS::baseAddress + offsets::dwLoclalPlayerPawn);
-        }
-        catch (...) {}
-
-        if (localPlayer) {
-            try {
-                g_LocalTeam = VARS::memRead<int>(localPlayer + offsets::m_iTeamNum);
-            }
-            catch (...) {}
-        }
-
-        std::vector<EntityData> newEntities(256);
-        for (int i = 0; i < 256; i++) {
-            uintptr_t ent = 0;
-            try {
-                ent = VARS::memRead<uintptr_t>(VARS::baseAddress + offsets::dwEntityList + i * 0x01);
-            }
-            catch (...) {}
-
-            if (ent == localPlayer) g_localPlayerIndex = i;
-
-            if (!ent || ent == (uintptr_t)-1) {
-                newEntities[i].isValid = false;
-                continue;
-            }
-
-            try {
-                int hp = VARS::memRead<int>(ent + offsets::m_iHealth);
-                if (hp <= 0 || hp > 100) {
-                    newEntities[i].isValid = false;
-                    continue;
-                }
-
-                newEntities[i].team = VARS::memRead<int>(ent + offsets::m_iTeamNum);
-                float posX = VARS::memRead<float>(ent + offsets::XPos);
-                float posY = VARS::memRead<float>(ent + offsets::YPos);
-                newEntities[i].position = WorldToScreen(posX, posY);
-                newEntities[i].isValid = true;
-
-            }
-            catch (...) {
-                newEntities[i].isValid = false;
-            }
-        }
-
-        {
-            std::lock_guard<std::mutex> lock(entitiesMutex);
-            entities = std::move(newEntities);
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
     }
 }
 

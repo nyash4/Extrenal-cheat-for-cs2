@@ -65,6 +65,18 @@
     <ClCompile Include="Radar.cpp">
       <Filter>Hacks</Filter>
     </ClCompile>
+    <ClCompile Include="ESP.cpp">
+      <Filter>Hacks</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityManager.cpp">
+      <Filter>Hacks</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityManager.hpp">
+      <Filter>Hacks</Filter>
+    </ClCompile>
+    <ClCompile Include="Resolution.cpp">
+      <Filter>Hacks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Imgui\imconfig.h">
@@ -107,6 +119,12 @@
       <Filter>Menu</Filter>
     </ClInclude>
     <ClInclude Include="Radar.hpp">
+      <Filter>Hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityData.hpp">
+      <Filter>Hacks</Filter>
+    </ClInclude>
+    <ClInclude Include="Resolution.hpp">
       <Filter>Hacks</Filter>
     </ClInclude>
   </ItemGroup>
