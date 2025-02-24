@@ -26,7 +26,7 @@ int EntityManager::GetLocalTeam() const {
 }
 
 int EntityManager::GetLocalPlayerIndex() const {
-    return g_localPlayerIndex.load();
+    return g_localPlayerIndex.load();    
 }
 
 void EntityManager::EntityUpdateThread() {

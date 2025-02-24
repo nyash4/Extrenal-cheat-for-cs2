@@ -44,10 +44,12 @@ void ESP::Render() {
 
     for (const auto& entity : entities) {
         if (!entity.isValid) continue;
+        std::cout << localTeam << std::endl;
         if (teamCheck && entity.team == localTeam) continue;
 
         // Преобразуем мировые координаты в экранные
         Vec3 screenPos = WorldToScreen(entity.position, viewMatrix, res.width, res.height);
+        //std::cout << screenPos.x << "\t" << screenPos.y << std::endl;
 
         // Проверяем, находится ли точка перед камерой
         if (screenPos.z < 0.1f) continue;
