@@ -28,11 +28,11 @@ void ESP::Render() {
     if (!espEnabled) return;
 
     // Получаем данные игрока
-    uintptr_t localPlayer = VARS::memRead<uintptr_t>(VARS::baseAddress + offsets::dwLoclalPlayerPawn);
+    uintptr_t localPlayer = MemoryUtils::ReadData<uintptr_t>(MemoryUtils::baseAddress + offsets::dwLoclalPlayerPawn);
     if (!localPlayer) return;
 
     // Получаем матрицу вида
-    view_matrix_t viewMatrix = VARS::memRead<view_matrix_t>(VARS::baseAddress + offsets::dwViewMatrix);
+    view_matrix_t viewMatrix = MemoryUtils::ReadData<view_matrix_t>(MemoryUtils::baseAddress + offsets::dwViewMatrix);
 
     // Получаем размеры окна
     // res.width, res.height;

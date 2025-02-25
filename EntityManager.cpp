@@ -33,13 +33,13 @@ void EntityManager::EntityUpdateThread() {
     while (running) {
         uintptr_t localPlayer = 0;
         try {
-            localPlayer = VARS::memRead<uintptr_t>(VARS::baseAddress + offsets::dwLoclalPlayerPawn);
+            localPlayer = MemoryUtils::ReadData<uintptr_t>(MemoryUtils::baseAddress + offsets::dwLoclalPlayerPawn);
         }
         catch (...) {}
 
         if (localPlayer) {
             try {
-                g_LocalTeam = VARS::memRead<int>(localPlayer + offsets::m_iTeamNum);
+                g_LocalTeam = MemoryUtils::ReadData<int>(localPlayer + offsets::m_iTeamNum);
             }
             catch (...) {}
         }
@@ -48,7 +48,7 @@ void EntityManager::EntityUpdateThread() {
         for (int i = 0; i < 256; i++) {
             uintptr_t ent = 0;
             try {
-                ent = VARS::memRead<uintptr_t>(VARS::baseAddress + offsets::dwEntityList + i * 0x08);
+                ent = MemoryUtils::ReadData<uintptr_t>(MemoryUtils::baseAddress + offsets::dwEntityList + i * 0x08);
             }
             catch (...) {}
 
@@ -60,16 +60,16 @@ void EntityManager::EntityUpdateThread() {
             }
 
             try {
-                int hp = VARS::memRead<int>(ent + offsets::m_iHealth);
+                int hp = MemoryUtils::ReadData<int>(ent + offsets::m_iHealth);
                 if (hp <= 0 || hp > 100) {
                     newEntities[i].isValid = false;
                     continue;
                 }
 
-                newEntities[i].team = VARS::memRead<int>(ent + offsets::m_iTeamNum);
-                newEntities[i].position.x = VARS::memRead<float>(ent + offsets::XPos);
-                newEntities[i].position.y = VARS::memRead<float>(ent + offsets::YPos);
-				newEntities[i].position.z = VARS::memRead<float>(ent + offsets::ZPos);
+                newEntities[i].team = MemoryUtils::ReadData<int>(ent + offsets::m_iTeamNum);
+                newEntities[i].position.x = MemoryUtils::ReadData<float>(ent + offsets::XPos);
+                newEntities[i].position.y = MemoryUtils::ReadData<float>(ent + offsets::YPos);
+				newEntities[i].position.z = MemoryUtils::ReadData<float>(ent + offsets::ZPos);
                 newEntities[i].isValid = true;
             }
             catch (...) {
@@ -82,6 +82,6 @@ void EntityManager::EntityUpdateThread() {
             entities = std::move(newEntities);
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        //std::this_thread::sleep_for(std::chrono::milliseconds(30));
     }
 }

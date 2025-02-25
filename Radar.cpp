@@ -26,8 +26,8 @@ Radar::~Radar() {
 
 void Radar::Update() {
     // Проверка смены карты
-    uintptr_t currentMapPtr = VARS::memRead<uintptr_t>(VARS::baseAddress + offsets::CurrentMap);
-    std::string newMap = VARS::memReadString(currentMapPtr, 11);
+    uintptr_t currentMapPtr = MemoryUtils::ReadData<uintptr_t>(MemoryUtils::baseAddress + offsets::CurrentMap);
+    std::string newMap = MemoryUtils::ReadString(currentMapPtr, 11);
 
     if (newMap != currentMap) {
         currentMap = newMap;
