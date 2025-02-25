@@ -79,8 +79,8 @@
     <LibraryPath>E:\sources\RadarHack\ImguiMenu\Library\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>E:\sources\RadarHack\ImguiMenu\Library\include;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\sources\RadarHack\ImguiMenu\Library\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\user\source\repos\ImguiMenu\Library\include;E:\sources\RadarHack\ImguiMenu\Library\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\user\source\repos\ImguiMenu\Library\lib;E:\sources\RadarHack\ImguiMenu\Library\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>E:\sources\RadarHack\ImguiMenu\Library\include;$(IncludePath)</IncludePath>
